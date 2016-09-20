@@ -68,6 +68,8 @@ public class Caller <T, Y> {
 	 */
 	public T call (Y y)throws TimeoutException{
 		
+		startMetrixReport("call circuitbreaker");
+		
 		T result = null;
 		ExecutorService executor = Executors.newFixedThreadPool(1);
 
@@ -82,7 +84,7 @@ public class Caller <T, Y> {
 					@Override
 					public T call(){
 						System.out.println("inside caller: execute external ...");
-						startMetrixReport();
+						startMetrixReport("call external");
 
 						return caller.call(y);
 					}
@@ -226,13 +228,13 @@ public class Caller <T, Y> {
 	 * 			Metrics
 	 * ============================ 
 	 */
-	private void startMetrixReport() {
+	private void startMetrixReport(String s) {
 		if (!useMetrix){
 			return;
 		}
 		
 		startReport();
-		Meter requests = metrics.meter("requests");
+		Meter requests = metrics.meter(s);
 		requests.mark();
 	}
 	private void startReport() {
