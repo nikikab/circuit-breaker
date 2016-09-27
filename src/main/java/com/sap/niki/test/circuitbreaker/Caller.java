@@ -201,7 +201,6 @@ public class Caller <T, Y> {
 
 	public void setConfig(Configurator config) {
 		this.config = config;
-//		this.config.
 	}
 
 
