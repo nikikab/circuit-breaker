@@ -99,9 +99,11 @@ public class Caller <T, Y> {
 			openingCircuit( BreakType.TIMEOUT );
 			throw e;
 		} catch (InterruptedException | ExecutionException e) {
+			/*TODO: add some meaningful logic here*/
 			e.printStackTrace();
 		}		
 		
+		//TODO: one possible improvement: return last successful call even after the configured timeout threshold 
 		return result;
 	
 	}
