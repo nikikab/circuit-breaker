@@ -19,8 +19,18 @@ import com.codahale.metrics.MetricRegistry;
 import com.sap.niki.test.circuitbreaker.Configurator.BreakType;
 import com.sap.niki.test.circuitbreaker.exc.CircuitTimeoutIsOpen;
 
-public class Caller <T, Y> {
+import com.google.common.base.Function;
+
+/**
+ *	 
+ * @author i030736
+ *
+ * @param <T> type of the return type 
+ * @param <Y> type of the input parameter type 
+ */
+public class Caller <Y, T> {
 	
+	private static final String GMT = "GMT";
 	static final MetricRegistry metrics = new MetricRegistry();
 	private ConsoleReporter reporter = null;
 	
@@ -33,13 +43,13 @@ public class Caller <T, Y> {
 
 	private String name;
 	private Configurator config;
-	CircuitBreakerCallable<T, Y> caller;
+	private Function<Y, T> function; 
 	
 	
-	public Caller(String name, CircuitBreakerCallable<T, Y> caller){
+	public Caller(String name, Function<Y, T> function){
 		setName(name);
 		setConfig(Configurator.getDefaultConfig());
-		this.caller= caller;
+		this.function = function;
 		initStates();
 	}
 
@@ -50,7 +60,7 @@ public class Caller <T, Y> {
 			BreakType next = types.next();
 			if (next != null){
 				circuitActualTypesCountDown.put(next, config.getCountDown4Type(next));
-				/*meaning the circuit is closed */
+				/* meaning the circuit is closed */
 				circuitOpenStartTyme.put(next, 0l);
 				circuitHalfOpenStartTyme.put(next, 0l);
 			}
@@ -61,10 +71,7 @@ public class Caller <T, Y> {
 	/**
 	 * This method implements the real circuitBreaker logic by 
 	 * - Executing the callable generic method if and only if the circuit is closed. 
-	 * - Open it up based on the configurator 
-	 * 
-	 * @param y
-	 * @return
+	 * - Open it up based on the configurator settings
 	 */
 	public T call (Y y)throws TimeoutException{
 		
@@ -85,8 +92,8 @@ public class Caller <T, Y> {
 					public T call(){
 						System.out.println("inside caller: execute external ...");
 						startMetrixReport("call external");
-
-						return caller.call(y);
+//						return caller.call(y);
+						return function.apply(y);
 					}
 
 				});
@@ -173,7 +180,7 @@ public class Caller <T, Y> {
 
 
 	private long getNowGMTMilis() {
-		return new GregorianCalendar(TimeZone.getTimeZone("GMT")).getTimeInMillis();
+		return new GregorianCalendar(TimeZone.getTimeZone(GMT)).getTimeInMillis();
 	}
 
 	public boolean isCircuitHalfOpen(BreakType type) {
@@ -182,10 +189,6 @@ public class Caller <T, Y> {
 
 	private void circuitUpdate(BreakType type ) {
 		Long now = getNowGMTMilis();
-//		System.out.println("-->now = " + now);
-//		System.out.println("-->circuitOpenStartTyme.get(type) = " + circuitOpenStartTyme.get(type));
-//		System.out.println("--> now - = " + (now - (Long)config.getGlobalCircuitOpenTimeout()) );
-//		System.out.println("-->config.getGlobalCircuitOpenTimeout()" + config.getGlobalCircuitOpenTimeout());
 		
 		if ( 	getActualCountDown(type) == 0 
 				&& 
@@ -201,7 +204,7 @@ public class Caller <T, Y> {
 		return config;
 	}
 
-	public void setConfig(Configurator config) {
+	private void setConfig(Configurator config) {
 		this.config = config;
 	}
 

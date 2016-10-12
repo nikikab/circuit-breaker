@@ -1,6 +1,5 @@
 package com.sap.niki.test.circuitbreaker;
 
-
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -8,11 +7,15 @@ import java.util.Map;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
+/**
+ * 
+ * @author i030736
+ * Each circuit breaker has a configurator which keeps the    	
+ */
 public class Configurator {
 	
 	public enum BreakType{
-		TIMEOUT, 
-		CONNECTION_REFUSED
+		TIMEOUT
 	}
 
 	public static Integer DEFAULT_BREAK_COUNT_DOWN = 3;

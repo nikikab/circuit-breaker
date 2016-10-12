@@ -8,7 +8,6 @@ import org.easymock.IAnswer;
 import org.junit.Test;
 
 import com.sap.niki.test.circuitbreaker.Caller;
-import com.sap.niki.test.circuitbreaker.CircuitBreakerCallable;
 import com.sap.niki.test.circuitbreaker.Configurator.BreakType;
 import com.sap.niki.test.circuitbreaker.exc.CircuitTimeoutIsOpen;
 import com.sap.niki.test.external.ExternalDummyService;
